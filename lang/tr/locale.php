@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    // Genel
+    'dashboard' => 'Kontrol Paneli',
+    'home' => 'Ana Sayfa',
+    'profile' => 'Profil',
+    'settings' => 'Ayarlar',
+    'search' => 'Ara',
+    'language' => 'Dil',
+    'turkish' => 'Türkçe',
+    'english' => 'İngilizce',
+    'welcome' => 'Hoş Geldiniz',
+    'welcome_message' => 'Kafe Yönetim Sistemine Hoş Geldiniz',
+    'welcome_description' => 'Bu panel üzerinden kafe operasyonlarınızı yönetebilirsiniz',
+    'cafe_management' => 'Kafe Yönetimi',
+    'search_placeholder' => 'Ara...',
+    'name' => 'Ad',
+    'select_role' => 'Rol Seçin',
+    'account' => 'Hesap',
+    'total_users' => 'Toplam Kullanıcı',
+
+    // Kimlik Doğrulama
+    'login' => 'Giriş Yap',
+    'register' => 'Kayıt Ol',
+    'logout' => 'Çıkış Yap',
+    'email' => 'E-posta',
+    'password' => 'Şifre',
+    'remember_me' => 'Beni Hatırla',
+    'forgot_password' => 'Şifremi Unuttum',
+    'reset_password' => 'Şifre Sıfırla',
+    'change_password' => 'Şifre Değiştir',
+    'current_password' => 'Mevcut Şifre',
+    'new_password' => 'Yeni Şifre',
+    'confirm_password' => 'Şifre Tekrar',
+    'email_verification' => 'E-posta Doğrulama',
+    'failed' => 'Bu kimlik bilgileri kayıtlarımızla eşleşmiyor.',
+    'throttle' => 'Çok fazla giriş denemesi. :seconds saniye sonra lütfen tekrar deneyin.',
+    'reset' => 'Parolanız sıfırlandı!',
+    'sent' => 'Parola sıfırlama bağlantınız e-posta ile gönderildi!',
+    'throttled' => 'Tekrar denemeden önce lütfen bekleyin.',
+    'token' => 'Parola sıfırlama kodu geçersiz.',
+    'user' => 'Bu e-posta adresi ile kayıtlı bir üye bulunamadı.',
+    'secure_area' => 'Bu, uygulamanın güvenli bir alanıdır. Devam etmeden önce lütfen şifrenizi onaylayın.',
+    'forgot_password_message' => 'Şifrenizi mi unuttunuz? Sorun değil. Sadece e-posta adresinizi bize bildirin, size yeni bir şifre seçmenizi sağlayacak bir şifre sıfırlama bağlantısı göndereceğiz.',
+    'email_password_reset_link' => 'E-posta Şifre Sıfırlama Bağlantısı',
+    'thanks_for_signing_up' => 'Kayıt olduğunuz için teşekkürler! Başlamadan önce, size az önce e-posta ile gönderdiğimiz bağlantıya tıklayarak e-posta adresinizi doğrulayabilir misiniz? E-postayı almadıysanız, size başka bir tane göndermekten memnuniyet duyarız.',
+    'verification_link_sent' => 'Kayıt sırasında verdiğiniz e-posta adresine yeni bir doğrulama bağlantısı gönderildi.',
+    'resend_verification_email' => 'Doğrulama E-postasını Yeniden Gönder',
+    'verify_message' => 'E-posta adresinizi doğrulayın',
+    'verify_email_sent' => 'Yeni bir doğrulama bağlantısı e-posta adresinize gönderildi.',
+    'verify_check_your_email' => 'Lütfen e-postanızı kontrol edin.',
+    'verify_if_not_recieved' => 'Eğer e-posta almadıysanız',
+    'verify_request_another' => 'başka bir tane isteyin',
+    'more_info' => 'Daha fazla bilgi için',
+
+    // Kullanıcı Yönetimi
+    'user_management' => 'Kullanıcı Yönetimi',
+    'users' => 'Kullanıcılar',
+    'roles' => 'Roller',
+    'permissions' => 'İzinler',
+    'add_user' => 'Kullanıcı Ekle',
+    'edit_user' => 'Kullanıcı Düzenle',
+    'delete_user' => 'Kullanıcı Sil',
+    'user_details' => 'Kullanıcı Detayları',
+    'profile_info' => 'Profil Bilgileri',
+
+    // Sistem Ayarları
+    'system_settings' => 'Sistem Ayarları',
+    'general_settings' => 'Genel Ayarlar',
+    'security_settings' => 'Güvenlik Ayarları',
+    'notification_settings' => 'Bildirim Ayarları',
+
+    // İşlemler
+    'actions' => 'İşlemler',
+    'edit' => 'Düzenle',
+    'delete' => 'Sil',
+    'save' => 'Kaydet',
+    'cancel' => 'İptal',
+    'confirm' => 'Onayla',
+    'back' => 'Geri',
+    'next' => 'İleri',
+    'previous' => '&laquo; Öncekiler',
+
+    // Bildirimler
+    'success' => 'Başarılı',
+    'error' => 'Hata',
+    'warning' => 'Uyarı',
+    'info' => 'Bilgi',
+    'no_results' => 'Sonuç bulunamadı',
+
+    // Hata Sayfaları
+    'error_404' => 'Sayfa Bulunamadı',
+    'error_403' => 'Erişim Reddedildi',
+    'error_500' => 'Sunucu Hatası',
+    'error_419' => 'Oturum Süresi Doldu',
+    'error_429' => 'Çok Fazla İstek',
+];
