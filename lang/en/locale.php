@@ -19,7 +19,7 @@ return [
     'search_placeholder' => 'Search...',
     'name' => 'Name',
     'select_role' => 'Select Role',
-    'account' => 'Hesap',
+    'account' => 'Account',
     'total_users' => 'Total Users',
 
     // Authentication

@@ -19,7 +19,7 @@
 
 @section('auth_body')
     <p class="login-box-msg">{{ __('locale.login_message') }}</p>
-    <form action="{{ $login_url }}" method="post">
+    <form action="{{ route('login') }}" method="post">
         @csrf
 
         {{-- Email field --}}
@@ -80,22 +80,22 @@
     </form>
 @stop
 
-@section('auth_footer')
-    {{-- Password reset link --}}
-    @if (config('adminlte.password_reset_url', 'password/reset'))
-        <p class="my-0">
-            <a href="{{ route(config('adminlte.password_reset_url', 'password/reset')) }}">
-                {{ __('locale.i_forgot_my_password') }}
-            </a>
-        </p>
-    @endif
+{{--@section('auth_footer')--}}
+{{--    --}}{{-- Password reset link --}}
+{{--    @if (config('adminlte.password_reset_url', 'password/reset'))--}}
+{{--        <p class="my-0">--}}
+{{--            <a href="{{ route(config('adminlte.password_reset_url', 'password/reset')) }}">--}}
+{{--                {{ __('locale.i_forgot_my_password') }}--}}
+{{--            </a>--}}
+{{--        </p>--}}
+{{--    @endif--}}
 
-    {{-- Register link --}}
-    @if (config('adminlte.register_url', 'register'))
-        <p class="my-0">
-            <a href="{{ $register_url }}">
-                {{ __('locale.register_a_new_membership') }}
-            </a>
-        </p>
-    @endif
-@stop
+{{--    --}}{{-- Register link --}}
+{{--    @if (config('adminlte.register_url', 'register'))--}}
+{{--        <p class="my-0">--}}
+{{--            <a href="{{ $register_url }}">--}}
+{{--                {{ __('locale.register_a_new_membership') }}--}}
+{{--            </a>--}}
+{{--        </p>--}}
+{{--    @endif--}}
+{{--@stop--}}
