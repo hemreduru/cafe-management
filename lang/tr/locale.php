@@ -140,6 +140,15 @@ return [
     'decrease_stock' => 'Stok Azalt',
     'close' => 'Kapat',
     'quantity' => 'Miktar',
+    'sales_summary' => 'Satış Özeti',
+    'sales_statistics' => 'Satış İstatistikleri',
+    'today_sales' => 'Todays Sales',
+    'this_week_sales' => 'Bu Hafta Satışları',
+    'this_month_sales' => 'Bu Ay Satışları',
+    'new_order' => 'Yeni Satış',
+    'popular_products' => 'Popüler Ürünler',
+    'sold' => 'Satıldı',
+    'view_all' => 'Hepsini Görüntüle',
 
     // Bildirim ve Onay İşlemleri
     'are_you_sure' => 'Emin misiniz?',
