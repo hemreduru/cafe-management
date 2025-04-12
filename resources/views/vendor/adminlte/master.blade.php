@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     {{-- Flash Mesajları için Meta Etiketleri --}}
     @if(session('success'))
         <meta name="session-success" content="{{ session('success') }}">
@@ -57,6 +57,7 @@
                 <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
                 <link rel="stylesheet" href="{{ asset('vendor/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
                 <link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/adminlte.min.css') }}">
+                <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.4/css/responsive.bootstrap5.css">
 
                 @if(config('adminlte.google_fonts.allowed', true))
                     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
@@ -130,7 +131,8 @@
                 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
                 <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
                 <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
-                <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}">
+                <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
+                <script src="https://cdn.datatables.net/responsive/3.0.4/js/dataTables.responsive.js"></script>
         @endswitch
     @endif
 
@@ -147,7 +149,6 @@
     @endif
 
     <script>
-        // Initialize dark mode on page load
         document.addEventListener('DOMContentLoaded', function() {
             @if(session('darkmode', false))
                 document.body.classList.add('dark-mode');
@@ -183,6 +184,179 @@
                 window.flashMessages.{{ $type }} = "{{ $message }}";
             @endforeach
         @endif
+    </script>
+
+    {{-- SweetAlert ve Toastr için genel ayarlar --}}
+    <script>
+        // Toastr ayarları
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        // Session mesajlarını Toastr ile gösterme
+        document.addEventListener('DOMContentLoaded', function() {
+            // Success mesajları
+            const successMsg = document.querySelector('meta[name="session-success"]');
+            if (successMsg) {
+                toastr.success(successMsg.getAttribute('content'));
+            }
+
+            // Error mesajları
+            const errorMsg = document.querySelector('meta[name="session-error"]');
+            if (errorMsg) {
+                toastr.error(errorMsg.getAttribute('content'));
+            }
+
+            // Warning mesajları
+            const warningMsg = document.querySelector('meta[name="session-warning"]');
+            if (warningMsg) {
+                toastr.warning(warningMsg.getAttribute('content'));
+            }
+
+            // Info mesajları
+            const infoMsg = document.querySelector('meta[name="session-info"]');
+            if (infoMsg) {
+                toastr.info(infoMsg.getAttribute('content'));
+            }
+
+            // SweetAlert2 ile form onayları
+            document.querySelectorAll('form[data-confirm]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    let title, text, confirmButtonText, cancelButtonText, icon;
+                    const confirmType = this.getAttribute('data-confirm');
+                    
+                    if (confirmType === 'delete') {
+                        title = "{{ __('locale.are_you_sure_delete') ?? 'Silmek istediğinize emin misiniz?' }}";
+                        text = "{{ __('locale.delete_warning') ?? 'Bu işlemi geri alamazsınız!' }}";
+                        confirmButtonText = "{{ __('locale.yes_delete') ?? 'Evet, sil!' }}";
+                        cancelButtonText = "{{ __('locale.cancel') ?? 'İptal' }}";
+                        icon = 'warning';
+                    } else {
+                        title = "{{ __('locale.are_you_sure') ?? 'Emin misiniz?' }}";
+                        text = "{{ __('locale.action_warning') ?? 'Bu işlemi gerçekleştirmek istediğinize emin misiniz?' }}";
+                        confirmButtonText = "{{ __('locale.confirm') ?? 'Onayla' }}";
+                        cancelButtonText = "{{ __('locale.cancel') ?? 'İptal' }}";
+                        icon = 'question';
+                    }
+
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: icon,
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: confirmButtonText,
+                        cancelButtonText: cancelButtonText
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.submit();
+                        }
+                    });
+                });
+            });
+
+            // AJAX işlemleri için Toastr ve SweetAlert2 entegrasyonu
+            $(document).on('click', '.ajax-action', function(e) {
+                e.preventDefault();
+                
+                const url = $(this).data('url');
+                const method = $(this).data('method') || 'POST';
+                const confirmType = $(this).data('confirm');
+                const successMessage = $(this).data('success-message') || 'İşlem başarıyla tamamlandı.';
+                const errorMessage = $(this).data('error-message') || 'İşlem sırasında bir hata oluştu.';
+                
+                if (confirmType) {
+                    let title, text, confirmButtonText, cancelButtonText, icon;
+                    
+                    if (confirmType === 'delete') {
+                        title = "{{ __('locale.are_you_sure_delete') ?? 'Silmek istediğinize emin misiniz?' }}";
+                        text = "{{ __('locale.delete_warning') ?? 'Bu işlemi geri alamazsınız!' }}";
+                        confirmButtonText = "{{ __('locale.yes_delete') ?? 'Evet, sil!' }}";
+                        cancelButtonText = "{{ __('locale.cancel') ?? 'İptal' }}";
+                        icon = 'warning';
+                    } else {
+                        title = "{{ __('locale.are_you_sure') ?? 'Emin misiniz?' }}";
+                        text = "{{ __('locale.action_warning') ?? 'Bu işlemi gerçekleştirmek istediğinize emin misiniz?' }}";
+                        confirmButtonText = "{{ __('locale.confirm') ?? 'Onayla' }}";
+                        cancelButtonText = "{{ __('locale.cancel') ?? 'İptal' }}";
+                        icon = 'question';
+                    }
+
+                    Swal.fire({
+                        title: title,
+                        text: text,
+                        icon: icon,
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: confirmButtonText,
+                        cancelButtonText: cancelButtonText
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            sendAjaxRequest(url, method, successMessage, errorMessage);
+                        }
+                    });
+                } else {
+                    sendAjaxRequest(url, method, successMessage, errorMessage);
+                }
+            });
+
+            function sendAjaxRequest(url, method, successMessage, errorMessage) {
+                $.ajax({
+                    url: url,
+                    method: method,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        toastr.success(response.message || successMessage);
+                        
+                        // DataTables'ı yeniden çizmek için
+                        if ($.fn.DataTable) {
+                            $('.dataTable').DataTable().ajax.reload();
+                        }
+                        
+                        // Başarılı bir işlem sonrası sayfa yenileme gerekiyorsa
+                        if (response.reload) {
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                        
+                        // Yönlendirme gerekiyorsa
+                        if (response.redirect) {
+                            setTimeout(function() {
+                                window.location.href = response.redirect;
+                            }, 1000);
+                        }
+                    },
+                    error: function(xhr) {
+                        let message = errorMessage;
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        toastr.error(message);
+                    }
+                });
+            }
+        });
     </script>
 
 </body>

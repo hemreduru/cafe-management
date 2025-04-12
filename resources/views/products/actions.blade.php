@@ -2,11 +2,11 @@
     <a href="{{ route('products.edit', $id) }}" class="btn btn-xs btn-primary">
         <i class="fas fa-edit"></i> {{ __('locale.edit') }}
     </a>
-    
+
     <a href="{{ route('products.show', $id) }}" class="btn btn-xs btn-info">
         <i class="fas fa-eye"></i> {{ __('locale.show') }}
     </a>
-    
+
     <form action="{{ route('products.destroy', $id) }}" method="POST" class="d-inline" data-confirm="delete">
         @csrf
         @method('DELETE')

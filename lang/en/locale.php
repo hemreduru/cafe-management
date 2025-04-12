@@ -108,7 +108,7 @@ return [
     'category_name_required' => 'The category name field is required.',
     'category_name_unique' => 'The category name has already been taken.',
     'cannot_delete_category_with_products' => 'Cannot delete category with associated products.',
-    
+
     // Product Management
     'products' => 'Products',
     'product' => 'Product',
@@ -138,9 +138,8 @@ return [
     'current_stock' => 'Current Stock',
     'increase_stock' => 'Increase Stock',
     'decrease_stock' => 'Decrease Stock',
-    'close' => 'Close', 
-    'stock_increase_form_will_be_here' => 'Stock increase form will be here',
-    'stock_decrease_form_will_be_here' => 'Stock decrease form will be here',
+    'close' => 'Close',
+    'quantity' => 'Quantity',
 
     // Error Pages
     'error_404' => 'Page Not Found',

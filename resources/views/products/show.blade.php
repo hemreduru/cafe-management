@@ -99,7 +99,7 @@
                 </div>
                 <div class="card-body">
                     <p class="mb-2">{{ __('locale.current_stock') }}: <strong>{{ $product->stock }}</strong></p>
-                    
+
                     <div class="d-flex justify-content-between mb-3 mt-4">
                         <a href="#" class="btn btn-success update-stock mr-2" data-toggle="modal" data-target="#increaseStockModal">
                             <i class="fas fa-plus-circle"></i> {{ __('locale.increase_stock') }}
@@ -117,20 +117,25 @@
     <div class="modal fade" id="increaseStockModal" tabindex="-1" role="dialog" aria-labelledby="increaseStockModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="increaseStockModalLabel">{{ __('locale.increase_stock') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Burada stok artırma formu olacak -->
-                    <p>{{ __('locale.stock_increase_form_will_be_here') }}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('locale.close') }}</button>
-                    <button type="button" class="btn btn-success">{{ __('locale.save') }}</button>
-                </div>
+                <form action="{{ route('products.increase-stock', $product) }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="increaseStockModalLabel">{{ __('locale.increase_stock') }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="quantity">{{ __('locale.quantity') }}</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('locale.close') }}</button>
+                        <button type="submit" class="btn btn-success">{{ __('locale.save') }}</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -139,20 +144,25 @@
     <div class="modal fade" id="decreaseStockModal" tabindex="-1" role="dialog" aria-labelledby="decreaseStockModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="decreaseStockModalLabel">{{ __('locale.decrease_stock') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Burada stok azaltma formu olacak -->
-                    <p>{{ __('locale.stock_decrease_form_will_be_here') }}</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('locale.close') }}</button>
-                    <button type="button" class="btn btn-danger">{{ __('locale.save') }}</button>
-                </div>
+                <form action="{{ route('products.decrease-stock', $product) }}" method="POST">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="decreaseStockModalLabel">{{ __('locale.decrease_stock') }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="quantity">{{ __('locale.quantity') }}</label>
+                            <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('locale.close') }}</button>
+                        <button type="submit" class="btn btn-danger">{{ __('locale.save') }}</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

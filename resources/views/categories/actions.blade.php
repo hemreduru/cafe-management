@@ -2,11 +2,11 @@
     <a href="{{ route('categories.edit', $id) }}" class="btn btn-xs btn-primary">
         <i class="fas fa-edit"></i> {{ __('locale.edit') }}
     </a>
-    
+
     <a href="{{ route('categories.show', $id) }}" class="btn btn-xs btn-info">
         <i class="fas fa-eye"></i> {{ __('locale.show') }}
     </a>
-    
+
     <form action="{{ route('categories.destroy', $id) }}" method="POST" class="d-inline" data-confirm="delete">
         @csrf
         @method('DELETE')

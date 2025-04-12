@@ -26,12 +26,12 @@
             <div class="table-responsive">
                 <table class="table table-bordered table-striped" id="categories-table">
                     <thead>
-                        <tr>
-                            <th style="width: 10px">#</th>
-                            <th>{{ __('locale.name') }}</th>
-                            <th>{{ __('locale.created_at') }}</th>
-                            <th style="width: 150px">{{ __('locale.actions') }}</th>
-                        </tr>
+                    <tr>
+                        <th style="width: 10px">#</th>
+                        <th>{{ __('locale.name') }}</th>
+                        <th>{{ __('locale.created_at') }}</th>
+                        <th style="width: 150px">{{ __('locale.actions') }}</th>
+                    </tr>
                     </thead>
                 </table>
             </div>
@@ -42,7 +42,7 @@
 @section('css')
     <style>
         .card {
-            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+            box-shadow: 0 0 1px rgba(0, 0, 0, .125), 0 1px 3px rgba(0, 0, 0, .2);
             margin-bottom: 1rem;
         }
     </style>
@@ -50,51 +50,30 @@
 
 @section('js')
     <script>
-        $(document).ready(function() {
-            console.log('Kategori DataTable başlatılıyor...');
-            try {
-                // jQuery'nin yüklenip yüklenmediğini kontrol et
-                if (typeof $ === 'undefined') {
-                    console.error('jQuery yüklenmemiş!');
-                    return;
-                }
-                
-                // DataTable'ın yüklenip yüklenmediğini kontrol et
-                if (typeof $.fn.DataTable === 'undefined') {
-                    console.error('DataTable yüklenmemiş!');
-                    return;
-                }
-                
-                console.log('DataTable ve jQuery yüklü.');
-                
-                // DataTables ayarları
-                $('#categories-table').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('categories.index') }}",
-                        error: function(xhr, error, thrown) {
-                            console.error('DataTable Ajax hatası:', error, thrown);
-                        }
-                    },
-                    columns: [
-                        { data: 'id', name: 'id' },
-                        { data: 'name', name: 'name' },
-                        { data: 'created_at', name: 'created_at' },
-                        { data: 'action', name: 'action', orderable: false, searchable: false }
-                    ],
-                    language: {
-                        "url": "{{ asset('js/localization/' . (app()->getLocale() === 'tr' ? 'Turkish.json' : 'English.json')) }}"
-                    }
-                });
-                
-                console.log('Kategori DataTable başlatıldı.');
-            } catch (error) {
-                console.error('Kategori DataTable başlatma hatası:', error);
-            }
+        $(document).ready(function () {
 
+            // DataTables ayarları
+            $('#categories-table').DataTable({
+                processing: true,
+                serverSide: true,
+                responsive: true,
+                ajax: {
+                    url: "{{ route('categories.index') }}",
+                },
+                columns: [
+                    {data: 'id', name: 'id'},
+                    {data: 'name', name: 'name'},
+                    {data: 'created_at', name: 'created_at'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+                language: {
+                    "url": "{{ asset('js/localization/' . (app()->getLocale() === 'tr' ? 'Turkish.json' : 'English.json')) }}"
+                }
+            });
+
+            console.log('Kategori DataTable başlatıldı.');
             // Uyarı mesajını 3 saniye sonra otomatik kapat
-            setTimeout(function() {
+            setTimeout(function () {
                 $('.alert').alert('close');
             }, 3000);
         });

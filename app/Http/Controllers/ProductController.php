@@ -8,9 +8,17 @@ use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
+use App\Services\StockService;
 
 class ProductController extends Controller
 {
+    private $stockService;
+
+    public function __construct(StockService $stockService)
+    {
+        $this->stockService = $stockService;
+    }
+
     /**
      * Ürün listesini görüntüle
      */
@@ -114,5 +122,31 @@ class ProductController extends Controller
             return redirect()->route('products.index')
                 ->with('error', __('locale.error') . ': ' . $e->getMessage());
         }
+    }
+
+    public function increaseStock(Request $request, Product $product)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        if ($this->stockService->increaseStock($product->id, $request->quantity)) {
+            return back()->with('success', __('locale.stock_increased_successfully'));
+        }
+
+        return back()->with('error', __('locale.stock_increase_failed'));
+    }
+
+    public function decreaseStock(Request $request, Product $product)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        if ($this->stockService->decreaseStock($product->id, $request->quantity)) {
+            return back()->with('success', __('locale.stock_decreased_successfully'));
+        }
+
+        return back()->with('error', __('locale.stock_decrease_failed'));
     }
 }

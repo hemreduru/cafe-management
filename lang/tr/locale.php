@@ -139,8 +139,7 @@ return [
     'increase_stock' => 'Stok Arttır',
     'decrease_stock' => 'Stok Azalt',
     'close' => 'Kapat',
-    'stock_increase_form_will_be_here' => 'Stok artırma formu burada olacak',
-    'stock_decrease_form_will_be_here' => 'Stok azaltma formu burada olacak',
+    'quantity' => 'Miktar',
 
     // Bildirim ve Onay İşlemleri
     'are_you_sure' => 'Emin misiniz?',

@@ -34,6 +34,9 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+
+    Route::post('products/{product}/increase-stock', [ProductController::class, 'increaseStock'])->name('products.increase-stock');
+    Route::post('products/{product}/decrease-stock', [ProductController::class, 'decreaseStock'])->name('products.decrease-stock');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
