@@ -93,6 +93,30 @@
         </div>
 
         <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title">{{ __('locale.add_to_cart') }}</h3>
+                </div>
+                <div class="card-body">
+                    @if($product->stock > 0)
+                        <form action="{{ route('cart.add', $product) }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <label for="cart_quantity">{{ __('locale.quantity') }}</label>
+                                <input type="number" name="quantity" id="cart_quantity" class="form-control" value="1" min="1" max="{{ $product->stock }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-cart-plus"></i> {{ __('locale.add_to_cart') }}
+                            </button>
+                        </form>
+                    @else
+                        <div class="alert alert-warning">
+                            {{ __('locale.out_of_stock') }}
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">{{ __('locale.stock_management') }}</h3>

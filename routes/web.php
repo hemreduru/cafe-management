@@ -6,6 +6,8 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\SalesController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,13 +32,25 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Kategori yönetimi route'ları
+// Kategori ve Ürün Yönetimi route'ları
 Route::middleware(['auth'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
 
     Route::post('products/{product}/increase-stock', [ProductController::class, 'increaseStock'])->name('products.increase-stock');
     Route::post('products/{product}/decrease-stock', [ProductController::class, 'decreaseStock'])->name('products.decrease-stock');
+
+    // Satış işlemleri route'ları
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{product}', [CartController::class, 'addToCart'])->name('cart.add');
+    Route::patch('/cart/items/{cartItem}', [CartController::class, 'updateQuantity'])->name('cart.update-quantity');
+    Route::delete('/cart/items/{cartItem}', [CartController::class, 'removeItem'])->name('cart.remove-item');
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+
+    // Satış geçmişi ve raporlar
+    Route::get('/sales', [SalesController::class, 'index'])->name('sales.index');
+    Route::get('/sales/{sale}', [SalesController::class, 'show'])->name('sales.show');
+    Route::get('/sales/reports', [SalesController::class, 'reports'])->name('sales.reports');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {

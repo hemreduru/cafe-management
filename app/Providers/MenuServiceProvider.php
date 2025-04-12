@@ -44,6 +44,21 @@ class MenuServiceProvider extends ServiceProvider
                         'url'  => 'products',
                         'icon' => 'fas fa-fw fa-cube'
                     ],
+                    [
+                        'text' => __('locale.new_sale'),
+                        'url'  => 'cart',
+                        'icon' => 'fas fa-fw fa-cash-register'
+                    ],
+                    [
+                        'text' => __('locale.sales_history'),
+                        'url'  => 'sales',
+                        'icon' => 'fas fa-fw fa-history'
+                    ],
+                    [
+                        'text' => __('locale.sales_reports'),
+                        'url'  => 'sales/reports',
+                        'icon' => 'fas fa-fw fa-chart-bar'
+                    ],
                 ]
             ]);
 
