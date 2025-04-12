@@ -8,6 +8,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    {{-- Flash Mesajları için Meta Etiketleri --}}
+    @if(session('success'))
+        <meta name="session-success" content="{{ session('success') }}">
+    @endif
+    @if(session('error'))
+        <meta name="session-error" content="{{ session('error') }}">
+    @endif
+    @if(session('warning'))
+        <meta name="session-warning" content="{{ session('warning') }}">
+    @endif
+    @if(session('info'))
+        <meta name="session-info" content="{{ session('info') }}">
+    @endif
 
     {{-- Custom Meta Tags --}}
     @yield('meta_tags')
@@ -88,6 +102,10 @@
         <meta name="msapplication-TileImage" content="{{ asset('favicon/ms-icon-144x144.png') }}">
     @endif
 
+    {{-- Toastr ve SweetAlert2 için CSS --}}
+    <link rel="stylesheet" href="{{ asset('vendor/toastr/toastr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/sweetalert2/sweetalert2.min.css') }}">
+
 </head>
 
 <body class="@yield('classes_body')" @yield('body_data')>
@@ -112,7 +130,7 @@
                 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
                 <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
                 <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
-                <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
+                <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}">
         @endswitch
     @endif
 
@@ -144,6 +162,28 @@
 
     {{-- Custom Scripts --}}
     @yield('adminlte_js')
+
+    {{-- SweetAlert2 ve Toastr JavaScript --}}
+    <script src="{{ asset('vendor/toastr/toastr.min.js') }}"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
+
+    {{-- Çeviriler ve flash mesajları için global değişkenler --}}
+    <script>
+        window.trans = window.trans || {};
+        window.flashMessages = window.flashMessages || {};
+
+        @if(isset($jsTranslations) && is_array($jsTranslations))
+            @foreach($jsTranslations as $key => $value)
+                window.trans.{{ $key }} = "{{ $value }}";
+            @endforeach
+        @endif
+
+        @if(isset($jsFlashMessages) && is_array($jsFlashMessages))
+            @foreach($jsFlashMessages as $type => $message)
+                window.flashMessages.{{ $type }} = "{{ $message }}";
+            @endforeach
+        @endif
+    </script>
 
 </body>
 

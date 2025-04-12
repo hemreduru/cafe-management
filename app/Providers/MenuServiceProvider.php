@@ -29,6 +29,24 @@ class MenuServiceProvider extends ServiceProvider
                 'icon' => 'fas fa-fw fa-tachometer-alt'
             ]);
 
+            // Kategori ve Ürün Yönetimi Menüsü
+            $event->menu->add([
+                'text'    => __('locale.cafe_management'),
+                'icon'    => 'fas fa-fw fa-coffee',
+                'submenu' => [
+                    [
+                        'text' => __('locale.categories'),
+                        'url'  => 'categories',
+                        'icon' => 'fas fa-fw fa-list'
+                    ],
+                    [
+                        'text' => __('locale.products'),
+                        'url'  => 'products',
+                        'icon' => 'fas fa-fw fa-cube'
+                    ],
+                ]
+            ]);
+
             // Kullanıcı Yönetimi Menüsü
             $event->menu->add([
                 'text'    => __('locale.user_management'),

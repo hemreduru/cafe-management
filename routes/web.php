@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +16,10 @@ Route::get('language/{locale}', [LanguageController::class, 'switchLang'])->name
 Route::post('darkmode/toggle',
     [App\Http\Controllers\DarkModeController::class, 'toggle'])->name('adminlte.darkmode.toggle');
 
+// Test sayfası
+Route::get('/test/notifications', function () {
+    return view('test.notification-test');
+})->name('test.notifications');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -22,6 +28,12 @@ Route::middleware('auth')->group(function () {
     })->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Kategori yönetimi route'ları
+Route::middleware(['auth'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
