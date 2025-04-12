@@ -41,7 +41,7 @@
                                                     <button type="button" class="btn btn-default btn-sm quantity-btn" data-action="decrease" data-item-id="{{ $item->id }}">
                                                         <i class="fas fa-minus"></i>
                                                     </button>
-                                                    <input type="number" class="form-control form-control-sm text-center quantity-input" 
+                                                    <input type="number" class="form-control form-control-sm text-center quantity-input"
                                                            value="{{ $item->quantity }}" min="1" max="{{ $item->product->stock }}"
                                                            data-item-id="{{ $item->id }}">
                                                     <button type="button" class="btn btn-default btn-sm quantity-btn" data-action="increase" data-item-id="{{ $item->id }}">
@@ -157,7 +157,7 @@
                                             <strong>{{ number_format($product->price, 2) }} ₺</strong>
                                             <small class="text-muted">({{ __('locale.stock') }}: {{ $product->stock }})</small>
                                         </p>
-                                        <button type="button" class="btn btn-primary btn-sm add-to-cart" 
+                                        <button type="button" class="btn btn-primary btn-sm add-to-cart"
                                                 data-product-id="{{ $product->id }}"
                                                 data-product-name="{{ $product->name }}"
                                                 data-product-price="{{ $product->price }}"
@@ -199,11 +199,14 @@
 $(document).ready(function() {
     // Ürün arama
     $('#productSearch').on('keyup', function() {
-        var value = $(this).val().toLowerCase();
+        var value = $(this).val().toLocaleLowerCase('tr-TR');
+
         $('.product-item').filter(function() {
-            $(this).toggle($(this).data('name').indexOf(value) > -1)
+            var productName = $(this).data('name').toLocaleLowerCase('tr-TR');
+            $(this).toggle(productName.indexOf(value) > -1);
         });
     });
+
 
     // Sepete ürün ekleme
     $('.add-to-cart').click(function() {
@@ -214,9 +217,9 @@ $(document).ready(function() {
 
         // Miktar seçimi için prompt
         var quantity = prompt("{{ __('locale.enter_quantity') }} ({{ __('locale.max') }}: " + productStock + ")", "1");
-        
+
         if (quantity === null) return;
-        
+
         quantity = parseInt(quantity);
         if (isNaN(quantity) || quantity < 1 || quantity > productStock) {
             alert("{{ __('locale.invalid_quantity') }}");

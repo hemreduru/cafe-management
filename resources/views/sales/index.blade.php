@@ -10,80 +10,117 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">{{ __('locale.sales_history') }}</h3>
+            <div class="card-tools">
+                <a href="{{ route('cart.index') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> {{ __('locale.new_sale') }}
+                </a>
+{{--                <a href="{{ route('sales.reports') }}" class="btn btn-info btn-sm ml-2">--}}
+{{--                    <i class="fas fa-chart-bar"></i> {{ __('locale.sales_reports') }}--}}
+{{--                </a>--}}
+            </div>
         </div>
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="start_date">{{ __('locale.start_date') }}</label>
-                        <input type="date" class="form-control" id="start_date" name="start_date"
-                               value="{{ request('start_date') }}">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="end_date">{{ __('locale.end_date') }}</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date"
-                               value="{{ request('end_date') }}">
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>&nbsp;</label>
-                        <button type="button" id="filterButton" class="btn btn-primary btn-block">
-                            <i class="fas fa-filter"></i> {{ __('locale.filter') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <table class="table table-hover" id="sales-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>{{ __('locale.date') }}</th>
+                        <th>{{ __('locale.users') }}</th>
+                        <th>{{ __('locale.total') }}</th>
+                        <th>{{ __('locale.actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- DataTables will populate this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-            <div class="table-responsive">
-                <table class="table table-striped" id="salesTable">
-                    <thead>
-                        <tr>
-                            <th>{{ __('locale.date') }}</th>
-                            <th>{{ __('locale.users') }}</th>
-                            <th>{{ __('locale.total') }}</th>
-                            <th>{{ __('locale.quantity') }}</th>
-                            <th>{{ __('locale.actions') }}</th>
-                        </tr>
-                    </thead>
-                </table>
+    <!-- Delete Sale Modal -->
+    <div class="modal fade" id="delete-sale-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('locale.confirm_delete') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ __('locale.confirm_delete') }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('locale.cancel') }}</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-sale">{{ __('locale.delete') }}</button>
+                </div>
             </div>
         </div>
     </div>
 @stop
 
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+@stop
+
 @section('js')
+{{--    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>--}}
     <script>
-        $(document).ready(function() {
-            var table = $('#salesTable').DataTable({
+        $(function () {
+            let saleToDelete = null;
+
+            // Initialize DataTable
+            $('#sales-table').DataTable({
                 processing: true,
                 serverSide: true,
-                responsive: true,
-                ajax: {
-                    url: '{{ route("sales.index") }}',
-                    data: function(d) {
-                        d.start_date = $('#start_date').val();
-                        d.end_date = $('#end_date').val();
-                    }
-                },
+                ajax: "{{ route('sales.index') }}",
                 columns: [
-                    {data: 'created_at', name: 'created_at', searchable: true},
-                    {data: 'user_name', name: 'user_name', searchable: true},
-                    {data: 'total_price', name: 'total_price', searchable: true},
-                    {data: 'total_items', name: 'total_items', searchable: true},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
-                ],
-                order: [[0, 'desc']],
-                pageLength: 10,
-                language: {
-                    url: "{{ asset('js/localization/' . (app()->getLocale() === 'tr' ? 'Turkish.json' : 'English.json')) }}"
-                }
+                    { data: 'id', name: 'id' },
+                    { data: 'created_at', name: 'created_at' },
+                    { data: 'user_id', name: 'user_id' },
+                    { data: 'total_price', name: 'total_price' },
+                    { data: 'action', name: 'action', orderable: false, searchable: false }
+                ]
             });
 
-            $('#filterButton').on('click', function() {
-                table.ajax.reload();
+            // Set sale ID when delete button clicked
+            $(document).on('click', '.delete-sale', function () {
+                saleToDelete = $(this).data('id');
+            });
+
+            // Delete sale when confirmed
+            $('#confirm-delete-sale').on('click', function () {
+                if (saleToDelete) {
+                    $.ajax({
+                        url: `/sales/${saleToDelete}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function (response) {
+                            $('#delete-sale-modal').modal('hide');
+                            $('#sales-table').DataTable().ajax.reload();
+
+                            // Show success alert
+                            Swal.fire({
+                                title: '{{ __("locale.success") }}',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000
+                            });
+                        },
+                        error: function (xhr) {
+                            $('#delete-sale-modal').modal('hide');
+
+                            // Show error alert
+                            Swal.fire({
+                                title: '{{ __("locale.error") }}',
+                                text: xhr.responseJSON ? xhr.responseJSON.message : '{{ __("locale.error_occurred") }}',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

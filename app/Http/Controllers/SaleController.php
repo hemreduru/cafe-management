@@ -16,7 +16,6 @@ class SaleController extends Controller
     {
         if ($request->ajax()) {
             $sales = Sale::with(['user', 'saleDetails.product']);
-            
             return DataTables::of($sales)
                 ->addColumn('action', function($sale) {
                     return view('sales.action', compact('sale'))->render();
@@ -33,7 +32,7 @@ class SaleController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        
+
         return view('sales.index');
     }
 
@@ -45,34 +44,4 @@ class SaleController extends Controller
         $sale->load(['user', 'saleDetails.product']);
         return view('sales.show', compact('sale'));
     }
-
-    /**
-     * Satış raporlarını görüntüle
-     */
-    public function reports(Request $request)
-    {
-        $startDate = $request->get('start_date', now()->startOfDay());
-        $endDate = $request->get('end_date', now()->endOfDay());
-
-        $sales = Sale::with(['saleDetails.product'])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->get();
-
-        $totalSales = $sales->sum('total_price');
-        $totalItems = $sales->sum(function($sale) {
-            return $sale->saleDetails->sum('quantity');
-        });
-
-        $topProducts = SaleDetail::with('product')
-            ->whereHas('sale', function($query) use ($startDate, $endDate) {
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            })
-            ->select('product_id', \DB::raw('SUM(quantity) as total_quantity'))
-            ->groupBy('product_id')
-            ->orderBy('total_quantity', 'desc')
-            ->limit(5)
-            ->get();
-
-        return view('sales.reports', compact('sales', 'totalSales', 'totalItems', 'topProducts', 'startDate', 'endDate'));
-    }
-} 
+}

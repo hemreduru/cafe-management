@@ -6,7 +6,6 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Sale;
-use App\Models\SaleDetail;
 use App\Services\StockService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +36,6 @@ class CartController extends Controller
             }
         }
 
-        // Tüm ürünleri kategorilerine göre gruplandırarak getir
         $products = Product::with('category')
             ->where('stock', '>', 0)
             ->orderBy('category_id')
@@ -56,8 +54,18 @@ class CartController extends Controller
     public function addToCart(Request $request, Product $product)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->stock
+            'quantity' => 'required|integer|min:1'
         ]);
+
+        if ($product->stock < $request->quantity) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('locale.insufficient_stock', ['product' => $product->name])
+                ]);
+            }
+            return back()->with('error', __('locale.insufficient_stock', ['product' => $product->name]));
+        }
 
         try {
             DB::beginTransaction();
@@ -66,17 +74,34 @@ class CartController extends Controller
                 ['user_id' => Auth::id(), 'is_checkedout' => false],
                 ['user_id' => Auth::id()]
             );
-
             $cartItem = CartItem::where('cart_id', $cart->id)
                 ->where('product_id', $product->id)
                 ->first();
 
+            $totalQuantity = $request->quantity;
             if ($cartItem) {
-                $newQuantity = $cartItem->quantity + $request->quantity;
-                if ($newQuantity > $product->stock) {
-                    throw new \Exception(__('locale.insufficient_stock', ['product' => $product->name]));
+                $totalQuantity += $cartItem->quantity;
+            }
+
+            if ($totalQuantity > $product->stock) {
+                DB::rollBack();
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => __('locale.total_quantity_exceeds_stock', [
+                            'product' => $product->name,
+                            'available' => $product->stock
+                        ])
+                    ]);
                 }
-                $cartItem->quantity = $newQuantity;
+                return back()->with('error', __('locale.total_quantity_exceeds_stock', [
+                    'product' => $product->name,
+                    'available' => $product->stock
+                ]));
+            }
+
+            if ($cartItem) {
+                $cartItem->quantity = $totalQuantity;
                 $cartItem->save();
             } else {
                 CartItem::create([
@@ -95,18 +120,18 @@ class CartController extends Controller
                 ]);
             }
 
-            return back()->with('success', __('locale.product_added_to_cart'));
+            return redirect()->route('cart.index')->with('success', __('locale.product_added_to_cart'));
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => $e->getMessage()
-                ], 422);
+                    'message' => __('locale.error_adding_to_cart') . ': ' . $e->getMessage()
+                ]);
             }
 
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', __('locale.error_adding_to_cart') . ': ' . $e->getMessage());
         }
     }
 
@@ -127,24 +152,25 @@ class CartController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => __('locale.unauthorized')
-                ], 403);
+                ]);
             }
             return back()->with('error', __('locale.unauthorized'));
         }
 
-        if (!$cartItem->product) {
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        // Stoktan fazla ürün eklenemez
+        if ($request->quantity > $cartItem->product->stock) {
             if ($request->ajax()) {
                 return response()->json([
                     'success' => false,
-                    'message' => __('locale.product_not_found')
-                ], 404);
+                    'message' => __('locale.insufficient_stock', ['product' => $cartItem->product->name])
+                ]);
             }
-            return back()->with('error', __('locale.product_not_found'));
+            return back()->with('error', __('locale.insufficient_stock', ['product' => $cartItem->product->name]));
         }
-
-        $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $cartItem->product->stock
-        ]);
 
         $cartItem->quantity = $request->quantity;
         $cartItem->save();
@@ -168,49 +194,39 @@ class CartController extends Controller
                 ->where('is_checkedout', false)
                 ->with(['cartItems.product'])
                 ->firstOrFail();
-
+                
             $totalPrice = 0;
             foreach ($cart->cartItems as $item) {
-                if (!$item->product) {
-                    throw new \Exception(__('locale.product_not_found'));
-                }
-                
                 if ($item->quantity > $item->product->stock) {
                     throw new \Exception(__('locale.insufficient_stock', ['product' => $item->product->name]));
                 }
                 $totalPrice += $item->product->price * $item->quantity;
             }
 
-            // Satış kaydı oluştur
             $sale = Sale::create([
                 'cart_id' => $cart->id,
                 'user_id' => Auth::id(),
                 'total_price' => $totalPrice
             ]);
-
-            // Satış detaylarını oluştur
+            
+            // Sepet öğelerini satış detaylarına ekle
             foreach ($cart->cartItems as $item) {
-                if (!$item->product) {
-                    throw new \Exception(__('locale.product_not_found'));
-                }
-
-                SaleDetail::create([
-                    'sale_id' => $sale->id,
+                // Sadece SaleDetail tablosuna kaydet (sales_details tablosu)
+                $sale->saleDetails()->create([
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->product->price
+                    'price' => $item->product->price * $item->quantity
                 ]);
-
-                // Stok miktarını güncelle
+                
+                // Stok azaltma işlemleri
                 $this->stockService->decreaseStock($item->product_id, $item->quantity);
             }
 
-            // Sepeti tamamlandı olarak işaretle
             $cart->is_checkedout = true;
             $cart->save();
 
             DB::commit();
-            return redirect()->route('cart.index')->with('success', __('locale.sale_completed'));
+            return redirect()->route('cart.index')->with('success', __('locale.checkout_successful'));
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
