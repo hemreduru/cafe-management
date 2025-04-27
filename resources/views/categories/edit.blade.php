@@ -11,10 +11,10 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('categories.update', $category) }}" method="POST">
+                    <form action="{{ route('categories.update', $category) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        
+
                         <div class="form-group">
                             <label for="name">{{ __('locale.name') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $category->name) }}" required>
@@ -22,7 +22,20 @@
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
                         </div>
-                        
+
+                        <div class="form-group">
+                            <label for="image">{{ __('locale.image') }}</label>
+                            <input type="file" class="form-control-file @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
+                            @if($category->image)
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/' . $category->image) }}" alt="{{ $category->name }}" style="max-height: 100px;">
+                                </div>
+                            @endif
+                            @error('image')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <div class="d-flex">
                             <button type="submit" class="btn btn-primary mr-2">
                                 <i class="fas fa-save"></i> {{ __('locale.update') }}

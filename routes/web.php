@@ -23,10 +23,8 @@ Route::get('/test/notifications', function () {
 })->name('test.notifications');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-    Route::get('/profile', function () {
-        return view('adminlte::auth.profile');
-    })->name('profile.index');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.index');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
@@ -47,8 +45,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 
     // Sales routes
+    Route::get('/sales/statistics', [App\Http\Controllers\SalesStatisticsController::class, 'index'])->name('sales.statistics');
+    Route::get('/sales/statistics/datatable', [App\Http\Controllers\SalesStatisticsController::class, 'datatable'])->name('sales.statistics.datatable');
+    Route::get('/sales/statistics/details/{productId}', [App\Http\Controllers\SalesStatisticsController::class, 'details'])->name('sales.statistics.details');
     Route::get('/sales', [App\Http\Controllers\SaleController::class, 'index'])->name('sales.index');
     Route::get('/sales/{sale}', [App\Http\Controllers\SaleController::class, 'show'])->name('sales.show');
+    Route::delete('/sales/{sale}', [App\Http\Controllers\SaleController::class, 'destroy'])->name('sales.destroy');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {

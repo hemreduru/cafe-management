@@ -114,6 +114,9 @@
                                                 <a href="{{ route('sales.show', $sale) }}" class="btn btn-info btn-sm">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                <button type="button" class="btn btn-danger btn-sm delete-sale" data-id="{{ $sale->id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -130,45 +133,74 @@
         </div>
     </div>
 
-    <!-- Ürün Ekleme Modal -->
-    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+    <div class="modal fade" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document" style="max-width: 98vw;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ __('locale.add_product') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
+                    <h5 class="modal-title" id="addProductModalLabel">{{ __('locale.add_product') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <input type="text" class="form-control" id="productSearch" placeholder="{{ __('locale.search_products') }}">
                     </div>
-                    <div class="row" id="productGrid">
-                        @foreach($products as $product)
-                            <div class="col-md-4 mb-3 product-item" data-name="{{ strtolower($product->name) }}">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ $product->name }}</h5>
-                                        <p class="card-text">
-                                            <small class="text-muted">{{ $product->category->name }}</small>
-                                        </p>
-                                        <p class="card-text">
-                                            <strong>{{ number_format($product->price, 2) }} ₺</strong>
-                                            <small class="text-muted">({{ __('locale.stock') }}: {{ $product->stock }})</small>
-                                        </p>
-                                        <button type="button" class="btn btn-primary btn-sm add-to-cart"
-                                                data-product-id="{{ $product->id }}"
-                                                data-product-name="{{ $product->name }}"
-                                                data-product-price="{{ $product->price }}"
-                                                data-product-stock="{{ $product->stock }}">
-                                            <i class="fas fa-plus"></i> {{ __('locale.add_to_cart') }}
+                    <div class="row flex-wrap justify-content-center" id="categoryAccordion" style="gap: 0.5rem;">
+                        @foreach($categories as $i => $category)
+                            <div class="col-5 col-md-5 mb-3 d-flex align-items-stretch">
+                                <div class="card w-100">
+                                    <div class="card-header p-2 category-header d-flex align-items-center" id="headingCat{{ $category->id }}" style="background: linear-gradient(90deg, #232526 0%, #414345 100%); border-radius: 8px 8px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                        @php
+                                            $shapes = ['square', 'triangle', 'circle'];
+                                            $shape = $shapes[$i % 3];
+                                            $colors = ['#ff7675', '#74b9ff', '#55efc4', '#fdcb6e', '#a29bfe', '#fab1a0', '#00b894', '#fd79a8'];
+                                            $color = $colors[$i % count($colors)];
+                                        @endphp
+                                        <span class="category-shape-icon mr-2" style="display:inline-block; width:28px; height:28px; background:{{ $shape == 'circle' ? $color : 'transparent' }}; border-radius:{{ $shape == 'circle' ? '50%' : '4px' }}; position:relative; vertical-align:middle;">
+                                            @if($shape == 'square')
+                                                <span style="display:block; width:100%; height:100%; background:{{ $color }}; border-radius:4px;"></span>
+                                            @elseif($shape == 'triangle')
+                                                <span style="display:block; width:0; height:0; border-left:14px solid transparent; border-right:14px solid transparent; border-bottom:28px solid {{ $color }}; position:absolute; left:0; top:0;"></span>
+                                            @endif
+                                        </span>
+                                        <button class="btn btn-link w-100 text-left text-white font-weight-bold category-header-btn" type="button" data-toggle="collapse" data-target="#collapseCat{{ $category->id }}" aria-expanded="false" aria-controls="collapseCat{{ $category->id }}" style="font-size: 1.15rem; letter-spacing: 0.5px; text-shadow: 0 2px 8px rgba(0,0,0,0.25); background: transparent;">
+                                            {{ $category->name }}
                                         </button>
+                                    </div>
+                                    <div id="collapseCat{{ $category->id }}" class="collapse" aria-labelledby="headingCat{{ $category->id }}" data-parent="#categoryAccordion">
+                                        <div class="card-body p-2">
+                                            <div class="row">
+                                                @forelse($category->products as $product)
+                                                    <div class="col-md-12 mb-3 product-item" data-name="{{ strtolower($product->name) }}">
+                                                        <div class="card h-100 product-card-bg add-to-cart-trigger"
+                                                            style="background: url('{{ $product->image ? asset('storage/' . $product->image) : asset('storage/products/1.jpg') }}') center center/cover no-repeat; min-height: 140px; position: relative; cursor:pointer;"
+                                                            data-product-id="{{ $product->id }}"
+                                                            data-product-name="{{ $product->name }}"
+                                                            data-product-price="{{ $product->price }}"
+                                                            data-product-stock="{{ $product->stock }}">
+                                                            <div class="card-body p-2 product-card-content" style="background: rgba(0,0,0,0.75); border-radius: 0 0 8px 8px; position: absolute; left: 0; bottom: 0; width: 100%; z-index: 2; color: #fff;">
+                                                                <h5 class="card-title mb-1" style="font-weight:bold; font-size:1.1rem; margin-bottom:0.25rem;">{{ $product->name }}</h5>
+                                                                <p class="card-text mb-0" style="font-size:0.95rem;">
+                                                                    <strong>{{ number_format($product->price, 2) }} ₺</strong>
+                                                                    <small class="text-white">({{ __('locale.stock') }}: {{ $product->stock }})</small>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @empty
+                                                    <div class="col-12 text-muted">{{ __('locale.no_products') }}</div>
+                                                @endforelse
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('locale.close') }}</button>
                 </div>
             </div>
         </div>
@@ -177,19 +209,32 @@
 
 @section('css')
     <style>
-        .card {
-            box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-            margin-bottom: 1rem;
+        .modal-xl {
+            max-width: 98vw !important;
         }
-        .modal-lg {
-            max-width: 90%;
+        #categoryAccordion {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
         }
-        .product-item .card {
-            transition: all 0.3s ease;
+        #categoryAccordion > .col-5.col-md-5 {
+            flex: 0 0 32%;
+            max-width: 32%;
+            min-width: 320px;
+            box-sizing: border-box;
         }
-        .product-item .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0,0,0,.1);
+        @media (max-width: 1200px) {
+            #categoryAccordion > .col-5.col-md-5 {
+                flex: 0 0 48%;
+                max-width: 48%;
+            }
+        }
+        @media (max-width: 767.98px) {
+            #categoryAccordion > .col-5.col-md-5 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
         }
     </style>
 @stop
@@ -198,53 +243,55 @@
 <script>
 $(document).ready(function() {
     // Ürün arama
-    $('#productSearch').on('keyup', function() {
-        var value = $(this).val().toLocaleLowerCase('tr-TR');
-
-        $('.product-item').filter(function() {
-            var productName = $(this).data('name').toLocaleLowerCase('tr-TR');
-            $(this).toggle(productName.indexOf(value) > -1);
-        });
+    let searchTimeout;
+    let lastQuery = '';
+    $('#productSearch').on('input', function() {
+        clearTimeout(searchTimeout);
+        var input = $(this);
+        var value = input.val().toLocaleLowerCase('tr-TR');
+        searchTimeout = setTimeout(function() {
+            // Eğer arada yeni bir sorgu geldiyse, bu sorguyu iptal et ve yenisini bekle
+            if (value !== lastQuery) {
+                lastQuery = value;
+                $('.product-item').each(function() {
+                    var productName = $(this).data('name').toLocaleLowerCase('tr-TR');
+                    if (productName.includes(value)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+        }, 300);
     });
 
-
-    // Sepete ürün ekleme
-    $('.add-to-cart').click(function() {
+    // Satış silme
+    $('.delete-sale').click(function() {
         var button = $(this);
-        var productId = button.data('product-id');
-        var productName = button.data('product-name');
-        var productStock = button.data('product-stock');
-
-        // Miktar seçimi için prompt
-        var quantity = prompt("{{ __('locale.enter_quantity') }} ({{ __('locale.max') }}: " + productStock + ")", "1");
-
-        if (quantity === null) return;
-
-        quantity = parseInt(quantity);
-        if (isNaN(quantity) || quantity < 1 || quantity > productStock) {
-            alert("{{ __('locale.invalid_quantity') }}");
-            return;
-        }
-
-        // AJAX ile sepete ekle
-        $.ajax({
-            url: '/cart/add/' + productId,
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                quantity: quantity
-            },
-            success: function(response) {
-                if (response.success) {
-                    location.reload();
-                } else {
-                    alert(response.message);
+        var saleId = button.data('id');
+        
+        if (confirm('{{ __("locale.confirm_delete") }}')) {
+            $.ajax({
+                url: '/sales/' + saleId,
+                method: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        button.closest('tr').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+                        toastr.success(response.message);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('{{ __("locale.error_occurred") }}');
                 }
-            },
-            error: function() {
-                alert("{{ __('locale.error_occurred') }}");
-            }
-        });
+            });
+        }
     });
 
     // Miktar güncelleme
@@ -257,13 +304,12 @@ $(document).ready(function() {
         var maxValue = parseInt(input.attr('max'));
 
         if (action === 'increase' && currentValue < maxValue) {
-            input.val(currentValue + 1).trigger('change');
+            updateQuantity(itemId, currentValue + 1);
         } else if (action === 'decrease' && currentValue > 1) {
-            input.val(currentValue - 1).trigger('change');
+            updateQuantity(itemId, currentValue - 1);
         }
     });
 
-    // Miktar input değişikliği
     $('.quantity-input').change(function() {
         var input = $(this);
         var itemId = input.data('item-id');
@@ -277,18 +323,28 @@ $(document).ready(function() {
             input.val(maxValue);
             quantity = maxValue;
         }
+        updateQuantity(itemId, quantity);
+    });
 
-        // AJAX ile miktar güncelle
+    function updateQuantity(itemId, quantity) {
         $.ajax({
-            url: '/cart/update/' + itemId,
-            method: 'POST',
+            url: '/cart/items/' + itemId,
+            method: 'PATCH',
             data: {
                 _token: '{{ csrf_token() }}',
                 quantity: quantity
             },
             success: function(response) {
                 if (response.success) {
-                    location.reload();
+                    // Sadece satırı güncelle, sayfayı yenileme
+                    var row = $('.quantity-input[data-item-id="' + itemId + '"]').closest('tr');
+                    row.find('td:eq(3)').text((response.item_total).toFixed(2) + ' ₺');
+                    // Toplamı güncelle
+                    if (response.cart_total !== undefined) {
+                        $('tfoot th[colspan="2"]:last').text((response.cart_total).toFixed(2) + ' ₺');
+                    }
+                    // Input değerini de güncelle
+                    $('.quantity-input[data-item-id="' + itemId + '"]').val(quantity);
                 } else {
                     alert(response.message);
                 }
@@ -297,7 +353,7 @@ $(document).ready(function() {
                 alert("{{ __('locale.error_occurred') }}");
             }
         });
-    });
+    }
 });
 </script>
 @stop

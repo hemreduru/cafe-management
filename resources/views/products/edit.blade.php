@@ -11,7 +11,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('products.update', $product) }}" method="POST">
+                    <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         
@@ -69,7 +69,20 @@
                                 </div>
                             </div>
                         </div>
-                        
+
+                        <div class="form-group">
+                            <label for="image">{{ __('locale.image') }}</label>
+                            <input type="file" class="form-control-file @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
+                            @if($product->image)
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" style="max-height: 100px;">
+                                </div>
+                            @endif
+                            @error('image')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <div class="d-flex">
                             <button type="submit" class="btn btn-primary mr-2">
                                 <i class="fas fa-save"></i> {{ __('locale.update') }}

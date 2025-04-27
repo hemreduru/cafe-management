@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 return [
+
+    'son_satislar' => 'Son Satışlar',
+    'tum_satis_gecmisi' => 'Tüm satış geçmişi',
+    'bugun_satilan_toplam' => 'Bugün yapılan satış',
+    'today_sales2' => 'Günlük Satış',
+    'yeni_satis' => 'Yeni Satış Başlat',
+    'total_user2' => 'Toplam Kullanıcı Sayısı',
     // Genel
     'dashboard' => 'Kontrol Paneli',
     'home' => 'Ana Sayfa',
@@ -24,6 +31,7 @@ return [
 
     // Kimlik Doğrulama
     'login' => 'Giriş Yap',
+	'sign_in' => 'Giriş Yap',
     'register' => 'Kayıt Ol',
     'logout' => 'Çıkış Yap',
     'email' => 'E-posta',
@@ -177,6 +185,10 @@ return [
     'please_wait' => 'Lütfen bekleyiniz...',
     'processing' => 'İşleniyor...',
     'loading' => 'Yükleniyor...',
+    'confirm_delete' => 'Bu satışı silmek istediğinizden emin misiniz?',
+    'sale_deleted_successfully' => 'Satış başarıyla silindi.',
+    'profile_details' => 'Profil Detayları',
+
 
     // Sepet
     'cart' => 'Sepet',
@@ -264,4 +276,8 @@ return [
     'last_6months' => 'Son 6 Ay',
     'last_year' => 'Geçen Yıl',
     'custom' => 'Özel',
+    'son10satis' => 'Son 10 Satış',
+    'istatistik' => 'İstatistikler',
+    'birim' => 'Satış İstatistikleri',
+    'checkout_successful' => 'Başarılı',
 ];

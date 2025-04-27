@@ -16,22 +16,22 @@ return [
     'yes_delete' => 'Evet, sil',
     'confirm_action' => 'Bu işlemi onaylıyor musunuz?',
     'yes_confirm' => 'Evet, onaylıyorum',
-    
+
     // Kategoriler
     'category_created' => 'Kategori başarıyla oluşturuldu.',
     'category_updated' => 'Kategori başarıyla güncellendi.',
     'category_deleted' => 'Kategori başarıyla silindi.',
-    
+
     // Ürünler
     'product_created' => 'Ürün başarıyla oluşturuldu.',
     'product_updated' => 'Ürün başarıyla güncellendi.',
     'product_deleted' => 'Ürün başarıyla silindi.',
     'product_not_found' => 'Ürün bulunamadı.',
-    
+
     // Stok
     'stock_updated' => 'Stok miktarı başarıyla güncellendi.',
     'stock_insufficient' => 'Yetersiz stok miktarı.',
-    
+
     // Satış
     'sale_created' => 'Satış başarıyla tamamlandı.',
     'sale_canceled' => 'Satış iptal edildi.',
@@ -49,7 +49,7 @@ return [
     'start_date' => 'Başlangıç Tarihi',
     'end_date' => 'Bitiş Tarihi',
     'filter' => 'Filtrele',
-    
+
     // Sepet
     'cart' => 'Sepet',
     'cart_added' => 'Ürün sepete eklendi.',
@@ -93,4 +93,5 @@ return [
     'please_wait' => 'Lütfen bekleyin...',
     'confirm_delete' => 'Silmek istediğinize emin misiniz?',
     'sale_completed' => 'Satış başarıyla tamamlandı',
+    'not_found_message' => 'Aradığınız sayfa bulunamadı.',
 ];

@@ -48,7 +48,11 @@ class CartController extends Controller
             ->take(5)
             ->get();
 
-        return view('cart.index', compact('cart', 'total', 'products', 'recentSales'));
+        $categories = \App\Models\Category::with(['products' => function($query) {
+            $query->where('stock', '>', 0)->orderBy('name');
+        }])->orderBy('name')->get();
+
+        return view('cart.index', compact('cart', 'total', 'products', 'recentSales', 'categories'));
     }
 
     public function addToCart(Request $request, Product $product)
@@ -176,9 +180,18 @@ class CartController extends Controller
         $cartItem->save();
 
         if ($request->ajax()) {
+            // Toplamları güncelle
+            $cart = $cartItem->cart->load('cartItems.product');
+            $cartTotal = 0;
+            foreach ($cart->cartItems as $item) {
+                if ($item->product) {
+                    $cartTotal += $item->product->price * $item->quantity;
+                }
+            }
             return response()->json([
                 'success' => true,
-                'message' => __('locale.cart_updated')
+                'item_total' => $cartItem->product->price * $cartItem->quantity,
+                'cart_total' => $cartTotal
             ]);
         }
 
@@ -194,7 +207,7 @@ class CartController extends Controller
                 ->where('is_checkedout', false)
                 ->with(['cartItems.product'])
                 ->firstOrFail();
-                
+
             $totalPrice = 0;
             foreach ($cart->cartItems as $item) {
                 if ($item->quantity > $item->product->stock) {
@@ -208,7 +221,7 @@ class CartController extends Controller
                 'user_id' => Auth::id(),
                 'total_price' => $totalPrice
             ]);
-            
+
             // Sepet öğelerini satış detaylarına ekle
             foreach ($cart->cartItems as $item) {
                 // Sadece SaleDetail tablosuna kaydet (sales_details tablosu)
@@ -217,7 +230,7 @@ class CartController extends Controller
                     'quantity' => $item->quantity,
                     'price' => $item->product->price * $item->quantity
                 ]);
-                
+
                 // Stok azaltma işlemleri
                 $this->stockService->decreaseStock($item->product_id, $item->quantity);
             }

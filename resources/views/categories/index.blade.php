@@ -27,9 +27,9 @@
                 <table class="table table-bordered table-striped" id="categories-table">
                     <thead>
                     <tr>
-                        <th style="width: 10px">#</th>
+{{--                        <th style="width: 10px">#</th>--}}
                         <th>{{ __('locale.name') }}</th>
-                        <th>{{ __('locale.created_at') }}</th>
+{{--                        <th>{{ __('locale.created_at') }}</th>--}}
                         <th style="width: 150px">{{ __('locale.actions') }}</th>
                     </tr>
                     </thead>
@@ -61,9 +61,9 @@
                     url: "{{ route('categories.index') }}",
                 },
                 columns: [
-                    {data: 'id', name: 'id'},
+                    // {data: 'id', name: 'id'},
                     {data: 'name', name: 'name'},
-                    {data: 'created_at', name: 'created_at'},
+                    // {data: 'created_at', name: 'created_at'},
                     {data: 'action', name: 'action', orderable: false, searchable: false}
                 ],
                 language: {

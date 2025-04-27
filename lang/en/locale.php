@@ -3,6 +3,14 @@
 declare(strict_types=1);
 
 return [
+
+    'son_satislar' => 'Last sales',
+    'tum_satis_gecmisi' => 'Total Sales',
+    'bugun_satilan_toplam' => 'Today Sales Total',
+    'today_sales2' => 'Today Sales',
+    'yeni_satis' => 'Start a New Sale',
+    'total_user2' => 'Total User',
+    'new_order' => 'New Order',
     // General
     'dashboard' => 'Dashboard',
     'home' => 'Home',
@@ -24,6 +32,7 @@ return [
 
     // Authentication
     'login' => 'Login',
+	'sign_in' => 'Login',
     'register' => 'Register',
     'logout' => 'Logout',
     'email' => 'Email',
@@ -72,6 +81,9 @@ return [
     'general_settings' => 'General Settings',
     'security_settings' => 'Security Settings',
     'notification_settings' => 'Notification Settings',
+    'confirm_delete' => 'Are you sure?',
+    'sale_deleted_successfully' => 'Delete success.',
+    'profile_details' => 'Profile',
 
     // Actions
     'actions' => 'Actions',
@@ -327,4 +339,7 @@ return [
     'end_date' => 'End Date',
     'items' => 'Items',
     'back' => 'Back',
+    'son10satis' => 'Last 10 Sales',
+    'birim' => 'Sales Statistics',
+    'checkout_successful' => 'Successful',
 ];

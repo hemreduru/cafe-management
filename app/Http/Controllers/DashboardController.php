@@ -18,19 +18,21 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalProducts = Product::count();
         $totalCategories = Category::count();
-        
+
         // Satış istatistikleri
         $today = Carbon::now()->startOfDay();
         $todaySales = Sale::whereDate('created_at', $today)->sum('total_price');
-        
+
         $thisWeekStart = Carbon::now()->startOfWeek();
         $thisWeekSales = Sale::where('created_at', '>=', $thisWeekStart)->sum('total_price');
-        
+
         $thisMonthStart = Carbon::now()->startOfMonth();
         $thisMonthSales = Sale::where('created_at', '>=', $thisMonthStart)->sum('total_price');
-        
+
         $totalSales = Sale::sum('total_price');
-        
+
+
+
         // Son 7 günün satışları (grafik için)
         $lastSevenDays = Carbon::now()->subDays(6)->startOfDay();
         $dailySales = Sale::where('created_at', '>=', $lastSevenDays)
@@ -40,7 +42,7 @@ class DashboardController extends Controller
             ->get()
             ->pluck('total', 'date')
             ->toArray();
-            
+
         // Son 7 günün günlerini oluştur
         $salesData = [];
         $labels = [];
@@ -49,13 +51,13 @@ class DashboardController extends Controller
             $labels[] = Carbon::now()->subDays($i)->format('d.m');
             $salesData[] = $dailySales[$date] ?? 0;
         }
-        
+
         // Son 5 satış
         $recentSales = Sale::with(['user', 'saleDetails.product'])
             ->latest()
             ->take(5)
             ->get();
-            
+
         // Popüler ürünler
         $popularProducts = DB::table('sales_details')
             ->join('products', 'sales_details.product_id', '=', 'products.id')
@@ -64,16 +66,16 @@ class DashboardController extends Controller
             ->orderBy('total_quantity', 'desc')
             ->take(5)
             ->get();
-        
+
         // Stok durumu kritik olan ürünler
         $lowStockProducts = Product::where('stock', '<=', 10)
             ->orderBy('stock')
             ->take(5)
             ->get();
-            
+
         return view('dashboard.index', compact(
-            'totalUsers', 
-            'totalProducts', 
+            'totalUsers',
+            'totalProducts',
             'totalCategories',
             'todaySales',
             'thisWeekSales',

@@ -22,9 +22,9 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         $category = $this->route('category');
-        
         return [
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ];
     }
 

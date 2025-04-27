@@ -29,34 +29,43 @@ class MenuServiceProvider extends ServiceProvider
                 'icon' => 'fas fa-fw fa-tachometer-alt'
             ]);
 
-            // Kategori ve Ürün Yönetimi Menüsü
-            $event->menu->add([
-                'text'    => __('locale.cafe_management'),
-                'icon'    => 'fas fa-fw fa-coffee',
-                'submenu' => [
-                    [
-                        'text' => __('locale.categories'),
-                        'url'  => 'categories',
-                        'icon' => 'fas fa-fw fa-list'
-                    ],
-                    [
-                        'text' => __('locale.products'),
-                        'url'  => 'products',
-                        'icon' => 'fas fa-fw fa-cube'
-                    ],
-                    [
+                    // Yeni Satış
+                    $event->menu->add([
                         'text' => __('locale.new_sale'),
                         'url'  => 'cart',
                         'icon' => 'fas fa-fw fa-cash-register'
-                    ],
+                    ]);
+
+
+            // kategoriler
+            $event->menu->add([
+                'text' => __('locale.categories'),
+                'url'  => 'categories',
+                'icon' => 'fas fa-fw fa-list'
+            ]);
+
+               // urunler
+               $event->menu->add([
+                'text' => __('locale.products'),
+                'url'  => 'products',
+                'icon' => 'fas fa-fw fa-cube'
+            ]);
+
+
+
+            // Kategori ve Ürün Yönetimi Menüsü
+            $event->menu->add([
+                'text'    => __('locale.istatistik'),
+                'icon'    => 'fas fa-fw fa-coffee',
+                'submenu' => [
                     [
                         'text' => __('locale.sales_history'),
                         'url'  => 'sales',
                         'icon' => 'fas fa-fw fa-history'
                     ],
                     [
-                        'text' => __('locale.sales_reports'),
-                        'url'  => 'sales/reports',
+                        'text' => __('locale.birim'),
+                        'url'  => 'sales/statistics',
                         'icon' => 'fas fa-fw fa-chart-bar'
                     ],
                 ]

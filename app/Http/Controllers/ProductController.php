@@ -26,7 +26,7 @@ class ProductController extends Controller
     {
         if ($request->ajax()) {
             $products = Product::with('category');
-            
+
             return DataTables::of($products)
                 ->addColumn('action', function($product) {
                     return view('products.action', compact('product'))->render();
@@ -43,7 +43,7 @@ class ProductController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        
+
         return view('products.index');
     }
 
@@ -61,14 +61,17 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        Product::create([
+        $data = [
             'name' => $request->name,
             'category_id' => $request->category_id,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
-        ]);
-
+        ];
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+        Product::create($data);
         return redirect()->route('products.index')
             ->with('success', __('locale.product_created_successfully'));
     }
@@ -95,14 +98,21 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update([
+        $data = [
             'name' => $request->name,
             'category_id' => $request->category_id,
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
-        ]);
-
+        ];
+        if ($request->hasFile('image')) {
+            // Eski resmi sil
+            if ($product->image) {
+                \Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+        $product->update($data);
         return redirect()->route('products.index')
             ->with('success', __('locale.product_updated_successfully'));
     }
@@ -115,7 +125,7 @@ class ProductController extends Controller
         try {
             // Ürünün satışlarda veya sepette kullanılıp kullanılmadığını kontrol edebilirsiniz
             $product->delete();
-            
+
             return redirect()->route('products.index')
                 ->with('success', __('locale.product_deleted_successfully'));
         } catch (\Exception $e) {

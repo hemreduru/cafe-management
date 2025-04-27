@@ -17,7 +17,7 @@ class CategoryController extends Controller
     {
         if ($request->ajax()) {
             $categories = Category::query();
-            
+
             return DataTables::of($categories)
                 ->addColumn('action', function($category) {
                     return view('categories.action', compact('category'))->render();
@@ -28,7 +28,7 @@ class CategoryController extends Controller
                 ->rawColumns(['action'])
                 ->make(true);
         }
-        
+
         return view('categories.index');
     }
 
@@ -45,10 +45,13 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        Category::create([
+        $data = [
             'name' => $request->name,
-        ]);
-
+        ];
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+        Category::create($data);
         return redirect()->route('categories.index')
             ->with('success', __('locale.category_created_successfully'));
     }
@@ -66,10 +69,17 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $category->update([
+        $data = [
             'name' => $request->name,
-        ]);
-
+        ];
+        if ($request->hasFile('image')) {
+            // Eski resmi sil
+            if ($category->image) {
+                \Storage::disk('public')->delete($category->image);
+            }
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+        $category->update($data);
         return redirect()->route('categories.index')
             ->with('success', __('locale.category_updated_successfully'));
     }
@@ -85,9 +95,9 @@ class CategoryController extends Controller
                 return redirect()->route('categories.index')
                     ->with('error', __('locale.cannot_delete_category_with_products'));
             }
-            
+
             $category->delete();
-            
+
             return redirect()->route('categories.index')
                 ->with('success', __('locale.category_deleted_successfully'));
         } catch (\Exception $e) {
