@@ -267,6 +267,7 @@ $(document).ready(function() {
                 }
             });
 
+
             // Eğer hiç ürün bulunamadıysa tüm kategorileri aç
             if (!hasVisibleProducts && searchText === '') {
                 $('.collapse').collapse('show');
