@@ -174,7 +174,7 @@
                                                 @forelse($category->products as $product)
                                                     <div class="col-md-12 mb-3 product-item" data-name="{{ strtolower($product->name) }}">
                                                         <div class="card h-100 product-card-bg add-to-cart-trigger"
-                                                            style="background: url('{{ $product->image ? asset('storage/products/' . $product->image) : asset('storage/products/1.jpg') }}') center center/cover no-repeat; min-height: 140px; position: relative; cursor:pointer;"
+                                                            style="background: url('{{ $product->image ? asset('images/products/' . $product->image) : asset('images/products/1.jpg') }}') center center/cover no-repeat; min-height: 140px; position: relative; cursor:pointer;"
                                                             data-product-id="{{ $product->id }}"
                                                             data-product-name="{{ $product->name }}"
                                                             data-product-price="{{ $product->price }}"
@@ -243,27 +243,69 @@
 @section('js')
 <script>
 $(document).ready(function() {
-    // Ürün arama
-    let searchTimeout;
-    let lastQuery = '';
-    $('#productSearch').on('input', function() {
+    // Ürün arama - Yeni versiyon
+    var searchTimeout;
+    $('#productSearch').on('keyup', function() {
         clearTimeout(searchTimeout);
-        var input = $(this);
-        var value = input.val().toLocaleLowerCase('tr-TR');
+        var searchText = $(this).val().toLowerCase();
+
         searchTimeout = setTimeout(function() {
-            // Eğer arada yeni bir sorgu geldiyse, bu sorguyu iptal et ve yenisini bekle
-            if (value !== lastQuery) {
-                lastQuery = value;
-                $('.product-item').each(function() {
-                    var productName = $(this).data('name').toLocaleLowerCase('tr-TR');
-                    if (productName.includes(value)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
+            var hasVisibleProducts = false;
+
+            // Önce tüm kategorileri kapat
+            $('.collapse').collapse('hide');
+
+            $('.product-item').each(function() {
+                var productName = $(this).find('.card-title').text().toLowerCase();
+                if (productName.indexOf(searchText) > -1) {
+                    $(this).show();
+                    // Ürünün bulunduğu kategoriyi aç
+                    $(this).closest('.collapse').collapse('show');
+                    hasVisibleProducts = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+
+            // Eğer hiç ürün bulunamadıysa tüm kategorileri aç
+            if (!hasVisibleProducts && searchText === '') {
+                $('.collapse').collapse('show');
             }
-        }, 300);
+        }, 500); // 0.5 saniye bekle
+    });
+
+    // Kategori açılır/kapanır yapısı
+    $('.category-header-btn').click(function() {
+        var target = $(this).data('target');
+        $(target).collapse('toggle');
+    });
+
+    // Ürün ekleme (modal içindeki ürün kartına tıklama)
+    $('.add-to-cart-trigger').click(function() {
+        var productId = $(this).data('product-id');
+        var maxStock = $(this).data('product-stock') || 1;
+        var quantity = 1; // Varsayılan olarak 1 adet eklenir
+
+        $.ajax({
+            url: '/cart/add/' + productId,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                quantity: quantity
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#addProductModal').modal('hide');
+                    // Sayfayı yenile veya bildirim göster
+                    location.reload();
+                } else {
+                    alert(response.message || 'Hata oluştu');
+                }
+            },
+            error: function(xhr) {
+                alert("{{ __('locale.error_occurred') }}");
+            }
+        });
     });
 
     // Satış silme
@@ -355,34 +397,6 @@ $(document).ready(function() {
             }
         });
     }
-
-    // Ürün ekleme (modal içindeki ürün kartına tıklama)
-    $('.add-to-cart-trigger').click(function() {
-        var productId = $(this).data('product-id');
-        var maxStock = $(this).data('product-stock') || 1;
-        var quantity = 1; // Varsayılan olarak 1 adet eklenir
-
-        $.ajax({
-            url: '/cart/add/' + productId,
-            method: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                quantity: quantity
-            },
-            success: function(response) {
-                if (response.success) {
-                    $('#addProductModal').modal('hide');
-                    // Sayfayı yenile veya bildirim göster
-                    location.reload();
-                } else {
-                    alert(response.message || 'Hata oluştu');
-                }
-            },
-            error: function(xhr) {
-                alert("{{ __('locale.error_occurred') }}");
-            }
-        });
-    });
 });
 </script>
 @stop

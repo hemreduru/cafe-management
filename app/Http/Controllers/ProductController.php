@@ -69,7 +69,10 @@ class ProductController extends Controller
             'stock' => $request->stock,
         ];
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images/products'), $imageName);
+            $data['image'] = $imageName;
         }
         Product::create($data);
         return redirect()->route('products.index')
@@ -108,9 +111,15 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             // Eski resmi sil
             if ($product->image) {
-                \Storage::disk('public')->delete($product->image);
+                $oldImagePath = public_path('images/products/' . $product->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
             }
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images/products'), $imageName);
+            $data['image'] = $imageName;
         }
         $product->update($data);
         return redirect()->route('products.index')
@@ -122,16 +131,16 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        try {
-            // Ürünün satışlarda veya sepette kullanılıp kullanılmadığını kontrol edebilirsiniz
-            $product->delete();
-
-            return redirect()->route('products.index')
-                ->with('success', __('locale.product_deleted_successfully'));
-        } catch (\Exception $e) {
-            return redirect()->route('products.index')
-                ->with('error', __('locale.error') . ': ' . $e->getMessage());
+        // Ürün resmini sil
+        if ($product->image) {
+            $imagePath = public_path('images/products/' . $product->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
         }
+        $product->delete();
+        return redirect()->route('products.index')
+            ->with('success', __('locale.product_deleted_successfully'));
     }
 
     public function increaseStock(Request $request, Product $product)
