@@ -174,7 +174,7 @@
                                                 @forelse($category->products as $product)
                                                     <div class="col-md-12 mb-3 product-item" data-name="{{ strtolower($product->name) }}">
                                                         <div class="card h-100 product-card-bg add-to-cart-trigger"
-                                                            style="background: url('{{ $product->image ? asset('storage/' . $product->image) : asset('storage/products/1.jpg') }}') center center/cover no-repeat; min-height: 140px; position: relative; cursor:pointer;"
+                                                            style="background: url('{{ $product->image ? asset('storage/products/' . $product->image) : asset('storage/products/1.jpg') }}') center center/cover no-repeat; min-height: 140px; position: relative; cursor:pointer;"
                                                             data-product-id="{{ $product->id }}"
                                                             data-product-name="{{ $product->name }}"
                                                             data-product-price="{{ $product->price }}"
@@ -191,6 +191,7 @@
                                                 @empty
                                                     <div class="col-12 text-muted">{{ __('locale.no_products') }}</div>
                                                 @endforelse
+
                                             </div>
                                         </div>
                                     </div>
