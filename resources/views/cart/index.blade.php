@@ -269,7 +269,7 @@ $(document).ready(function() {
     $('.delete-sale').click(function() {
         var button = $(this);
         var saleId = button.data('id');
-        
+
         if (confirm('{{ __("locale.confirm_delete") }}')) {
             $.ajax({
                 url: '/sales/' + saleId,
@@ -354,6 +354,34 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Ürün ekleme (modal içindeki ürün kartına tıklama)
+    $('.add-to-cart-trigger').click(function() {
+        var productId = $(this).data('product-id');
+        var maxStock = $(this).data('product-stock') || 1;
+        var quantity = 1; // Varsayılan olarak 1 adet eklenir
+
+        $.ajax({
+            url: '/cart/add/' + productId,
+            method: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                quantity: quantity
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#addProductModal').modal('hide');
+                    // Sayfayı yenile veya bildirim göster
+                    location.reload();
+                } else {
+                    alert(response.message || 'Hata oluştu');
+                }
+            },
+            error: function(xhr) {
+                alert("{{ __('locale.error_occurred') }}");
+            }
+        });
+    });
 });
 </script>
 @stop
